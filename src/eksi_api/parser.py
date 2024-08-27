@@ -56,7 +56,7 @@ class EksiParser:
             entry_links.append(link)
         entries = []
         for title, slug, link in zip(entry_titles, entry_slugs, entry_links):
-            entries.append({"title": title, "slug": slug, "link": link})
+            entries.append({"title": title, "slug": slug, "url": link})
         return entries
 
     def get_topic(self, url, page=1):
