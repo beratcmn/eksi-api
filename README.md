@@ -35,6 +35,14 @@
 
 4. Access the API documentation at `http://localhost:8000/docs`.
 
+## Unit Testing
+
+Run the unit tests using the following command:
+
+```bash
+uv run pytest
+```
+
 ## Usage
 
 ### Search Topics
