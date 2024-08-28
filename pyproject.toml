@@ -1,7 +1,7 @@
 [project]
 name = "eksi-api"
 version = "0.1.0"
-description = "Add your description here"
+description = "Unofficial API for Eksi Sozluk"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
