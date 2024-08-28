@@ -1,5 +1,7 @@
 {
     "python.analysis.extraPaths": [
-        "./src/eksi_api"
+        "./src/eksi_api",
+        "../src/eksi_api",
+        "./src/eksi_api/eksi_api",
     ]
 }

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from parser import EksiParser
+from .parser import EksiParser
 
 app = FastAPI()
 
