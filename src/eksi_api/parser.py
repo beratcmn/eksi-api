@@ -30,18 +30,14 @@ class EksiParser:
                 logging.error(
                     f"Failed to retrieve the page. Status code: {response.status}"
                 )
-                return {
-                    "url": url,
-                    "status": response.status,
-                    "error": response.status_text,
-                }
+                return None, None
 
             content = page.content()
             browser.close()
-            return content
+            return content, response.url
 
     def get_trending_topics(self):
-        html = self.get_eksi_page(self.BASE_URL + "/basliklar/gundem")
+        html, url = self.get_eksi_page(self.BASE_URL + "/basliklar/gundem")
         soup = BeautifulSoup(html, "html.parser")
         entries_h1 = soup.find_all("h1", id="title")
         entry_titles = []
@@ -60,9 +56,11 @@ class EksiParser:
         return entries
 
     def get_topic(self, url, page=1):
-        url = f"{url}&p={page}" if page > 1 else url
+        html, forwarded_url = self.get_eksi_page(url)
+        url = forwarded_url
+        url = f"{url}?p={page}" if page > 1 else url
         logging.info(f"Getting entry: {url}")
-        html = self.get_eksi_page(url)
+        html, forwarded_url = self.get_eksi_page(url)
         if self.debug:
             with open("eksi_search.html", "w", encoding="utf-8") as file:
                 file.write(html)
@@ -80,7 +78,12 @@ class EksiParser:
         title = soup.find("title").text
         # logging.info(f"Title: {title}")
 
-        return {"url": url, "title": title, "page": page, "page_count": page_count}
+        return {
+            "url": forwarded_url,
+            "title": title,
+            "page": page,
+            "page_count": page_count,
+        }
 
     def search_topic(self, query, page=1):
         query = query.replace(" ", "+")
@@ -98,7 +101,8 @@ class EksiParser:
         return self.get_topic(url, page)
 
     def get_entries_from_url(self, url):
-        html = self.get_eksi_page(url)
+        logging.info(f"Getting entries from: {url}")
+        html, forwarded_url = self.get_eksi_page(url)
         soup = BeautifulSoup(html, "html.parser")
         entries_ul = soup.find("ul", id="entry-item-list")
         entries = []
@@ -110,14 +114,17 @@ class EksiParser:
                 author = entry_li.get("data-author")
                 author_id = entry_li.get("data-author-id")
                 content = entry_li.find("div", class_="content")
-                if content:
-                    content = content.text.strip()
+                date = entry_li.find("a", class_="entry-date permalink")
+                content = content.text.strip() if content else ""
+                date = date.text.strip() if date else ""
+
                 entries.append(
                     {
                         "id": id,
                         "author": author,
                         "author_id": author_id,
                         "content": content,
+                        "date": date,
                     }
                 )
         return entries
